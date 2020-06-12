@@ -65,6 +65,6 @@ public class ProductSearchResources {
 	public ResponseEntity<Page<Product>> searchPagingAndSorting(ProductFilter filter,
 			@PageableDefault(size = 100) Pageable pageable) {
 
-		return ResponseEntity.ok(service.findAll(pageable));
+		return ResponseEntity.ok(service.searchPagingAndSorting(filter, pageable));
 	}
 }

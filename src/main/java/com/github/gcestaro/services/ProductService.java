@@ -7,6 +7,7 @@ import static org.elasticsearch.index.query.QueryBuilders.fuzzyQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchPhrasePrefixQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchPhraseQuery;
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
+import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static org.elasticsearch.index.query.QueryBuilders.regexpQuery;
 import static org.elasticsearch.index.query.QueryBuilders.wildcardQuery;
 
@@ -16,6 +17,8 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
+import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.index.query.WildcardQueryBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -60,7 +63,7 @@ public class ProductService {
 	public List<Product> phraseSearch(String description) {
 		log.info("Phrase searching by: {}", description);
 
-		QueryBuilder matchPhraseQuery = matchPhraseQuery("description.raw", description);
+		QueryBuilder matchPhraseQuery = matchPhraseQuery("description", description);
 
 		return findProducts(matchPhraseQuery);
 	}
@@ -68,15 +71,15 @@ public class ProductService {
 	public List<Product> fuzzySearch(String description) {
 		log.info("Fuzzy searching by: {}", description);
 
-		QueryBuilder fuzzyQueryBuilder = fuzzyQuery("description.raw", description);
+		QueryBuilder fuzzyQueryBuilder = fuzzyQuery("description", description);
 
 		return findProducts(fuzzyQueryBuilder);
 	}
 
 	public List<Product> searchAsYouType(String description) {
-		log.info("Partial-match searching by: {}", description);
+		log.info("Search-as-you-type searching by: {}", description);
 
-		QueryBuilder matchPhrasePrefixQuery = matchPhrasePrefixQuery("description.raw", description)
+		QueryBuilder matchPhrasePrefixQuery = matchPhrasePrefixQuery("description", description)
 				.slop(5);
 
 		return findProducts(matchPhrasePrefixQuery);
@@ -104,11 +107,18 @@ public class ProductService {
 		BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
 
 		if (filter.filterByDescription()) {
-			boolQuery.must(QueryBuilders.fuzzyQuery("description.raw", filter.getDescription()));
+			WildcardQueryBuilder wildcardQuery = wildcardQuery("description.raw",
+					"*" + filter.getDescription() + "*");
+
+			boolQuery.must(wildcardQuery);
 		}
 
 		if (filter.filterByRange()) {
-			boolQuery.must(QueryBuilders.fuzzyQuery("description.raw", filter.getDescription()));
+			RangeQueryBuilder rangeQuery = rangeQuery("createdAt")
+					.gte(filter.getCreatedFrom())
+					.lte(filter.getCreatedTo());
+
+			boolQuery.must(rangeQuery);
 		}
 
 		NativeSearchQuery query = new NativeSearchQueryBuilder()

@@ -2,6 +2,8 @@ package com.github.gcestaro.resources.filters;
 
 import java.time.LocalDateTime;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
@@ -17,8 +19,10 @@ public class ProductFilter {
 
 	private String description;
 
+	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
 	private LocalDateTime createdFrom;
 
+	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
 	private LocalDateTime createdTo;
 
 	public boolean filterByDescription() {

@@ -1,0 +1,27 @@
+OK - http://localhost:8080/products/full-text-search?text=Baby Product
+OK - http://localhost:8080/products/full-text-search?text=Baby
+ 0 - http://localhost:8080/products/full-text-search?text=B
+OK - http://localhost:8080/products/full-text-search?text=B*
+
+OK - http://localhost:8080/products/phrase-search?description=Baby product
+ 0 - http://localhost:8080/products/phrase-search?description=Baby
+ 0 - http://localhost:8080/products/phrase-search?description=Baby*
+
+OK - http://localhost:8080/products/fuzzy-search?description=Baby Product
+ 0 - http://localhost:8080/products/fuzzy-search?description=Baby
+ 0 - http://localhost:8080/products/fuzzy-search?description=Baby*
+OK - http://localhost:8080/products/fuzzy-search?description=Baby Pradoct
+ 0 - http://localhost:8080/products/fuzzy-search?description=Baby Pradocts
+
+OK - http://localhost:8080/products/partial-matching-wildcard-search?description=Baby Product
+ 0 - http://localhost:8080/products/partial-matching-wildcard-search?description=Baby
+OK - http://localhost:8080/products/partial-matching-wildcard-search?description=Baby*
+OK - http://localhost:8080/products/partial-matching-wildcard-search?description=*
+
+OK - http://localhost:8080/products/partial-matching-regex-search?description=.*%5BbB%5D.*%5BpP%5D.*
+
+OK - http://localhost:8080/products/search-as-you-type?description=b
+ 0 - http://localhost:8080/products/search-as-you-type?description=a
+
+   - http://localhost:8080/products?description=b&createdFrom=2020-06-30T00:00:00.000-00:00&createdTo=2020-06-01T00:00:00.000-00:00
+   
