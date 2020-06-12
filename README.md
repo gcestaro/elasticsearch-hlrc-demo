@@ -19,8 +19,11 @@ GET /products/phrase-search
 ### Fuzzy search
 GET /products/fuzzy-search
 
-### Partial-matching search
-GET /products/partial-matching-search
+### Partial-matching Wildcard search
+GET /products/partial-matching-wildcard-search
+
+### Partial-matching RegEx search
+GET /products/partial-matching-regex-search
 
 ### Search-as-you-type
 GET /products/search-as-you-type

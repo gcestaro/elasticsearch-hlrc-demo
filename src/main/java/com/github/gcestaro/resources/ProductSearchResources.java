@@ -43,10 +43,16 @@ public class ProductSearchResources {
 		return ResponseEntity.ok(service.fuzzySearch(description));
 	}
 
-	@GetMapping("/partial-matching-search")
-	public ResponseEntity<List<Product>> partialMatchSearch(@RequestParam String description) {
+	@GetMapping("/partial-matching-wildcard-search")
+	public ResponseEntity<List<Product>> partialMatchWildcardSearch(@RequestParam String description) {
 
-		return ResponseEntity.ok(service.partialMatchSearch(description));
+		return ResponseEntity.ok(service.partialMatchWildcardSearch(description));
+	}
+
+	@GetMapping("/partial-matching-regex-search")
+	public ResponseEntity<List<Product>> partialMatchRegularExpressionSearch(@RequestParam String description) {
+
+		return ResponseEntity.ok(service.partialMatchRegularExpressionSearch(description));
 	}
 
 	@GetMapping("/search-as-you-type")

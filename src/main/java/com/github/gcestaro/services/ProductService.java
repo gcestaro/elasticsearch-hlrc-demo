@@ -12,10 +12,12 @@ import static org.elasticsearch.index.query.QueryBuilders.wildcardQuery;
 
 import java.util.List;
 
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
@@ -99,24 +101,42 @@ public class ProductService {
 	public Page<Product> searchPagingAndSorting(ProductFilter filter, Pageable pageable) {
 		log.info("Page search by: {}", filter);
 
-//		QueryBuilders.boolQuery()
+		BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
 
-//		QueryStringQueryBuilder queryStringQuery = queryStringQuery(text);
+		if (filter.filterByDescription()) {
+			boolQuery.must(QueryBuilders.fuzzyQuery("description.raw", filter.getDescription()));
+		}
 
-//		return findProducts(queryStringQuery);
-		return null;
+		if (filter.filterByRange()) {
+			boolQuery.must(QueryBuilders.fuzzyQuery("description.raw", filter.getDescription()));
+		}
+
+		NativeSearchQuery query = new NativeSearchQueryBuilder()
+				.withQuery(boolQuery)
+				.withPageable(pageable)
+				.build();
+
+		SearchHits<Product> products = elasticsearchOperations.search(query, Product.class);
+
+		logResult(products);
+
+		return new PageImpl<>(products.map(SearchHit::getContent).toList());
 	}
 
-	private List<Product> findProducts(QueryBuilder fuzzyQueryBuilder) {
+	private List<Product> findProducts(QueryBuilder queryBuilder) {
 		NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
-				.withQuery(fuzzyQueryBuilder)
+				.withQuery(queryBuilder)
 				.build();
 
 		SearchHits<Product> products = elasticsearchOperations.search(searchQuery, Product.class);
 
-		log.info("{} products returned", products.getTotalHits());
+		logResult(products);
 
 		return products.map(SearchHit::getContent).toList();
+	}
+
+	private void logResult(SearchHits<Product> products) {
+		log.info("{} products returned", products.getTotalHits());
 	}
 
 	public void load() {
